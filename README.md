@@ -16,9 +16,9 @@
 
 ![screenshot](image/2.2.png)
 
-![screenshot](image/2.3.png)
-
 ![screenshot](image/2.4.png)
+
+![screenshot](image/2.3.png)
 
 3. Модифицировать код сервера таким образом, чтобы все служебные сообщения выводились не в консоль, а в специальный лог-файл.
 

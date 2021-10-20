@@ -8,7 +8,6 @@ class ServerHandler(ServerBaseHandler):
 
     def handle(self):
         token = self.input('!get_token')
-        print(token)
         if self.server.is_valid_token(self.ip, token):
             self.on_success()
         else:
@@ -33,12 +32,11 @@ class ServerHandler(ServerBaseHandler):
         self.echo_forever()
 
 
-
 def _main():
     port = ask_port()
     logger = Logger('log.txt')
     users = JSONUsersStorage('users.json')
-    with Server('', ServerHandler, port, logger, users) as server:
+    with Server('', ServerHandler, port, users_storage=users) as server:
         server.accept_forever()
 
 

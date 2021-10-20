@@ -171,12 +171,16 @@ class ServerBaseHandler(ABC):
 
     def recv(self, bufsize=1024, encoding='utf-8'):
         data = self._socket.recv(bufsize).decode(encoding)
-        self.server.log(f'Данные приняты от клиента {self.ip}:{self.port}')
-        return data
+        length = data[:3]
+        self.server.log(f'Данные ({int(length)} симв.) приняты от клиента '
+                        f'{self.ip}:{self.port}')
+        return data[3:]
 
     def send(self, data, encoding='utf-8'):
-        self._socket.send(data.encode(encoding))
-        self.server.log(f'Данные отправлены клиенту {self.ip}:{self.port}')
+        length = '{:0>3}'.format(len(data))
+        self._socket.send((length + data).encode(encoding))
+        self.server.log(f'Данные ({int(length)} симв.) отправлены клиенту '
+                        f'{self.ip}:{self.port}')
 
     def input(self, message):
         self.send(message)
@@ -186,6 +190,7 @@ class ServerBaseHandler(ABC):
         while True:
             data = self.recv()
             if not data:
+                self.server.log(f'Клиент {self.ip}:{self.port} отключен')
                 break
             self.send(data)
 

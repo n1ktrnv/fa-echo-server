@@ -8,6 +8,19 @@ DEFAULT_HOST = 'localhost'
 EXIT = 'exit'
 
 
+def send(sock, data):
+    length = '{:0>3}'.format(len(data))
+    sock.send((length + data).encode())
+    print(f'Отправлено {int(length)} симв.')
+
+
+def recv(sock):
+    data = sock.recv(1024).decode()
+    length = data[:3]
+    print(f'Получено {int(length)} симв.')
+    return data[3:]
+
+
 def _main():
     host = input('Введите имя хоста (или Enter для использования значения по '
                  'умолчанию): ')
@@ -19,27 +32,27 @@ def _main():
     sock.connect((host, port))
 
     while True:
-        command = sock.recv(1024).decode()
+        command = recv(sock)
         if command == '!get_token':
             token = Path('token.txt').read_text()
             if token:
-                sock.send(Path('token.txt').read_text().encode())
+                send(sock, Path('token.txt').read_text())
             else:
-                sock.send(str(None).encode())
+                send(sock, str(None).encode())
         elif command == '!save_token':
-            Path('token.txt').write_text(sock.recv(1024).decode())
+            Path('token.txt').write_text(recv(sock))
         elif command == '!password':
-            sock.send(input('Введите пароль: ').encode())
+            send(sock, input('Введите пароль: '))
         elif command == '!username':
-            sock.send(input('Введите имя: ').encode())
+            send(sock, input('Введите имя: '))
         elif command == '!success':
-            print(sock.recv(1024).decode())
+            print(recv(sock))
             while True:
                 message = input()
                 if message == EXIT:
                     break
-                sock.send(message.encode())
-                data = sock.recv(1024).decode()
+                send(sock, message)
+                data = recv(sock)
                 print(data)
             break
         elif command == '!forbidden':
